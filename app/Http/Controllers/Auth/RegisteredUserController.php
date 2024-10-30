@@ -25,25 +25,16 @@ class RegisteredUserController extends Controller
             $username = '@' . $username;
         }
 
-         // Handle avatar upload
-    $avatarUrl = null;
-    if ($request->hasFile('avatar')) {
-        try {
-            $uploadedFileUrl = Cloudinary::upload($request->file('avatar')->getRealPath(), [
-                'folder' => 'avatars',
-                'transformation' => [
-                    'width' => 400,
-                    'height' => 400,
-                    'crop' => 'limit'
-                ]
-            ])->getSecurePath();
-
-            $avatarUrl = $uploadedFileUrl;
-            
-        } catch (\Exception $e) {
-            \Log::error('Avatar upload failed: ' . $e->getMessage());
+        // Handle avatar upload
+        $avatarUrl = null;
+        if ($request->hasFile('avatar')) {
+            try {
+                $cloudinaryImage = $request->file('avatar')->storeOnCloudinary('avatars');
+                $avatarUrl = $cloudinaryImage->getSecurePath();
+            } catch (\Exception $e) {
+                \Log::error('Avatar upload failed: ' . $e->getMessage());
+            }
         }
-    }
 
         $user = User::create([
             'username' => $username,
