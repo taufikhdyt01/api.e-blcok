@@ -27,20 +27,15 @@ class RegisteredUserController extends Controller
         // Handle avatar upload
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar');
-            $fileName = time() . '_' . $avatar->getClientOriginalName();
+            try {
+                $avatar = $request->file('avatar');
+                $fileName = time() . '_' . $avatar->getClientOriginalName();
 
-            // Gunakan base_path() untuk mendapatkan path absolut ke root project
-            $uploadPath = base_path('public/avatars');
-
-            // Buat direktori jika belum ada
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
+                $avatar->move('avatars', $fileName);
+                $avatarPath = 'avatars/' . $fileName;
+            } catch (\Exception $e) {
+                \Log::error('Avatar upload failed: ' . $e->getMessage());
             }
-
-            // Pindahkan file
-            $avatar->move($uploadPath, $fileName);
-            $avatarPath = 'avatars/' . $fileName;
         }
 
         $user = User::create([
