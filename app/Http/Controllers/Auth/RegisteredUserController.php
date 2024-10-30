@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class RegisteredUserController extends Controller
 {
@@ -24,26 +25,32 @@ class RegisteredUserController extends Controller
             $username = '@' . $username;
         }
 
-        // Handle avatar upload
-        $avatarPath = null;
-        if ($request->hasFile('avatar')) {
-            try {
-                $avatar = $request->file('avatar');
-                $fileName = time() . '_' . $avatar->getClientOriginalName();
+         // Handle avatar upload
+    $avatarUrl = null;
+    if ($request->hasFile('avatar')) {
+        try {
+            $uploadedFileUrl = Cloudinary::upload($request->file('avatar')->getRealPath(), [
+                'folder' => 'avatars',
+                'transformation' => [
+                    'width' => 400,
+                    'height' => 400,
+                    'crop' => 'limit'
+                ]
+            ])->getSecurePath();
 
-                $avatar->move('avatars', $fileName);
-                $avatarPath = 'avatars/' . $fileName;
-            } catch (\Exception $e) {
-                \Log::error('Avatar upload failed: ' . $e->getMessage());
-            }
+            $avatarUrl = $uploadedFileUrl;
+            
+        } catch (\Exception $e) {
+            \Log::error('Avatar upload failed: ' . $e->getMessage());
         }
+    }
 
         $user = User::create([
             'username' => $username,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'avatar' => $avatarPath,
+            'avatar' => $avatarUrl,
             'role' => $request->role ?? 'user',
         ]);
 
