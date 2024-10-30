@@ -10,7 +10,6 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
-
 class RegisteredUserController extends Controller
 {
     /**
@@ -25,14 +24,22 @@ class RegisteredUserController extends Controller
             $username = '@' . $username;
         }
 
+        // Handle avatar upload
+    $avatarPath = null;
+    if ($request->hasFile('avatar')) {
+        $avatar = $request->file('avatar');
+        $fileName = time() . '_' . $avatar->getClientOriginalName();
+        // Pastikan folder public/avatar sudah ada
+        $avatar->move(public_path('avatars'), $fileName);
+        $avatarPath = 'avatars/' . $fileName;
+    }
+
         $user = User::create([
             'username' => $username,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'avatar' => $request->hasFile('avatar') 
-                ? $request->file('avatar')->store('avatars', 'public')
-                : null,
+            'avatar' => $avatarPath,
             'role' => $request->role ?? 'user',
         ]);
 
@@ -48,10 +55,6 @@ class RegisteredUserController extends Controller
             ],
         ];
 
-        return response_success(
-            'Registrasi User Berhasil',
-            $data,
-            Response::HTTP_CREATED
-        );
+        return response_success('Registrasi User Berhasil', $data, Response::HTTP_CREATED);
     }
 }

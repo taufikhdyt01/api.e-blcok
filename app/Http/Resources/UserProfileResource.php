@@ -14,7 +14,7 @@ class UserProfileResource extends JsonResource
             'username' => $this['user']->username,
             'name' => $this['user']->name,
             'email' => $this['user']->email,
-            'avatar' => $this['user']->avatar ? url('storage/'.$this['user']->avatar) : null,
+            'avatar' => $this['user']->avatar ? url($this['user']->avatar) : null,
             'total_challenges' => $this['total_challenges'],
             'completed_challenges' => $this['completed_challenges'],
             'total_score' => $this['total_score'],
