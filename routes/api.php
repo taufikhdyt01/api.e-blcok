@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/submissions/{id}', [SubmissionController::class, 'getSubmissionDetail']);
     Route::get('/challenges/{slug}/leaderboard', [LeaderboardController::class, 'getChallengeLeaderboard']);
     Route::get('/user/profile', [UserController::class, 'getProfile']);
+    Route::post('/user/profile/update', [UserController::class, 'updateProfile']);
 });
 
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
