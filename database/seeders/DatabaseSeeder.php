@@ -23,7 +23,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            ChallengeSeeder::class
+            ChallengeSeeder::class,
+            AdditionalChallengeSeeder::class,
+            WebProgrammingChallengeSeeder::class,
+            WebEasyChallengeSeeder::class
         ]);
     }
 }
